@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+<section class="auth" aria-labelledby="auth-title">
+  <h2 id="auth-title">Iniciar Sesión</h2>
+
+  {# Mensajes flash #}
+  {% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% if mensajes %}
+      <div class="alerts">
+        {% for categoria, msg in mensajes %}
+          <div class="alert alert-{{ categoria }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <form method="post" class="form auth-form" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="next" value="{{ request.args.get('next','') }}">
+
+    <div class="form-row">
+      <label for="email">Correo electrónico</label>
+      <input
+        id="email"
+        type="email"
+        name="email"
+        required
+        inputmode="email"
+        autocapitalize="none"
+        autocomplete="username"
+        value="{{ request.form.get('email','') }}"
+        autofocus
+      />
+      {# Si pasas 'errors' desde la vista, mostrará errores específicos #}
+      {% if errors and errors.get('email') %}
+        <small class="error">{{ errors['email'][0] }}</small>
+      {% endif %}
+    </div>
+
+    <div class="form-row">
+      <label for="password">Contraseña</label>
+      <div class="input-with-action" style="display:flex;gap:.5rem;align-items:center;">
+        <input
+          id="password"
+          type="password"
+          name="password"
+          required
+          autocomplete="current-password"
+        />
+        <button type="button" class="btn-link" aria-pressed="false" aria-label="Mostrar u ocultar contraseña"
+          onclick="
+            const i=document.getElementById('password');
+            i.type = (i.type==='password') ? 'text' : 'password';
+            this.setAttribute('aria-pressed', this.getAttribute('aria-pressed')!=='true');
+          ">👁</button>
+      </div>
+      {% if errors and errors.get('password') %}
+        <small class="error">{{ errors['password'][0] }}</small>
+      {% endif %}
+    </div>
+
+    <div class="form-row form-check" style="display:flex;align-items:center;gap:.5rem;">
+      <input type="checkbox" id="remember" name="remember" value="1"
+             {% if request.form.get('remember') %}checked{% endif %}>
+      <label for="remember">Recordarme</label>
+    </div>
+
+    <div class="form-actions" style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+      <button type="submit" class="btn">Iniciar sesión</button>
+      <a class="btn-link" href="{{ url_for('registro') }}">Crear cuenta</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
